@@ -1,27 +1,27 @@
 import os
 import time
 
-debug = False
+debug = True
 
 class Invasion():
     def __init__(self):
         
         #Print starting screen
         print("\n\n")
-        print("    !@#$%  &    !      V     A       S      I        O     N                   ")
-        print("      *    $#   @                                                              ")
-        print("      %    % $  #                                                              ")
-        print("      #    ^  ( $                                                              ")
-        print("    ^*(%#  *   +$                                                              ")
-        print("                                                                               ")
-        print("\n\n")
+        print("       !@#$%  &    !  $       /     ^       {+%#   AAAAA    AAA   &    !     ")
+        print("         *    $#   @   %     }     & @     @         A     A   A  $#   @     ")
+        print("         %    % $  #    (   ?     ; - +     >&^#     A     A   A  % $  #     ")
+        print("         #    ^  ( $     = `     -     $        ~    A     A   A  ^  ( $     ")
+        print("       ^*(%#  *   +$      #     *       #   )+!?   AAAAA    AAA   *   +$     ")
+        print("                                                                             ")
+        print("\n\n\n\n\n\n")
         input("                        Press Enter to start the game                        \n                                                                             \n                                     ")
         
         #Set game variables
-        self.alive = True
         self.health = 100
         self.name = ""
         self.chapter = ""
+        self.finished = False
         
         #Prepare screen for game
         os.system('cls')
@@ -37,10 +37,6 @@ class Invasion():
     #Getter for player status
     def is_alive(self):
         return self.alive
-
-    #Move flashing dash on screen
-    def clr_dash(self):
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 
     #Method for displaying loading screen
     def show_loadscreen(self):
@@ -64,7 +60,6 @@ class Invasion():
 
         print("\n\n\n")
         print(("Okay, " + self.name + ", welcome to this game!").center(80))
-        self.clr_dash()
         self.wait(2)
         self.clr()
 
@@ -97,10 +92,131 @@ class Invasion():
     #Method for printing story information with 3 lines
     def story_3(self, line1, line2, line3):
         self.clr()
-        print("\n\n\n")
+        print("\n\n\n\n")
         print(line1.center(80))
         print(line2.center(80))
         print(line3.center(80))
+
+    #Method for introduction chapter
+    def intro_chapter(self):
+        print("\n\n")
+        print("----- Introduction -----".center(80))
+        print("\n")
+        self.wait(5)
+        print("This story is set in the United States of America.".center(80))
+        print("\n")
+        self.wait(3)
+        print("You and Tyler are best friends.".center(80))
+        print("\n")
+        self.wait(3)
+        print("Together with Tyler and your brother Evan,".center(80), end="") 
+        print("you are going to see a movie in the cinema.".center(80))
+        print("\n\n\n\n\n")
+        input("")
+        self.clr()
+
+        #Subchapter a_1
+        self.chapter = "a_1"
+        q_string = self.option_1("You are sitting in the cinema. The movie hasn't started yet.", "talk/walk/wait")
+        while not(self.a_1(q_string)):
+            q_string = self.option_1("You are sitting in the cinema. The movie hasn't started yet.", "talk/walk/wait")
+        input("")
+        self.clr()
+
+        #Subchapter a_1
+        self.chapter = "a_2"
+        q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
+        while not(self.a_2(q_string)):
+            q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
+        self.health = self.health - 90
+        input("")
+        self.clr()
+
+        return True
+
+    #Method for mall chapter
+    def mall_chapter(self):
+        print("\n\n")
+        print("----- The Shopping Mall -----".center(80))
+        print("\n")
+        self.wait(5)
+        print("After a long walk, you arrive at a shopping mall.".center(80))
+        print("\n")
+        self.wait(3)
+        print("The mall looks abandoned.".center(80))
+        print("\n")
+        self.wait(3)
+        print("Tyler: We can probably find some clothing and weapons in there!".center(80)) 
+        print("\n")
+        self.wait(3)
+        print("However, something seems off..".center(80))
+        print("\n\n\n")
+        input("")
+        self.clr()
+
+    #Method for supermarket chapter
+    def supermarket_chapter(self):
+        print("\n\n")
+        print("----- The Supermarket -----".center(80))
+        print("\n")
+        self.wait(5)
+        print("".center(80))
+        print("\n")
+        self.wait(3)
+        print("".center(80))
+        print("\n")
+        self.wait(3)
+        print("".center(80)) 
+        print("\n")
+        self.wait(3)
+        print("".center(80))
+        print("\n\n\n")
+        input("")
+        self.clr()
+
+    #Method for gas station chapter
+    def gas_chapter(self):
+        print("\n\n")
+        print("----- The Gas Station -----".center(80))
+        print("\n")
+        self.wait(5)
+        print("".center(80))
+        print("\n")
+        self.wait(3)
+        print("".center(80))
+        print("\n")
+        self.wait(3)
+        print("".center(80)) 
+        print("\n")
+        self.wait(3)
+        print("".center(80))
+        print("\n\n\n")
+        input("")
+        self.clr()
+
+    #Method for chapter in the woods
+    def woods_chapter(self):
+        print("\n\n")
+        print("----- The Woods -----".center(80))
+        print("\n")
+        self.wait(5)
+        print("".center(80))
+        print("\n")
+        self.wait(3)
+        print("".center(80))
+        print("\n")
+        self.wait(3)
+        print("".center(80)) 
+        print("\n")
+        self.wait(3)
+        print("".center(80))
+        print("\n\n\n")
+        input("")
+        self.clr()
+
+    #Method for final chapter of the story
+    def final_chapter(self):
+        self.finished = True
 
     #Methods for each choice in storyline
     def a_1(self, opt):
@@ -118,46 +234,14 @@ class Invasion():
     def a_2(self, opt):
         if opt == "talk":
             self.story_3((self.name.title() + ": What the hell is going on?!"), "And what is that guy on the front row even doing?", "Tyler: I didn't even notice him until now. Sir. SIR! EXCUSE ME!")
+            #Show more text, meet person and add to journey.
             return True
         elif opt == "run":
             self.story_2((self.name.title() + ": Guys, let's get out of here ASAP."), "Tyler: Smart words, this seems unsafe!")
             return True
         else:
             return False
-
-    #Method for chapter 1
-    def chapter_a(self):
-        print("\n\n")
-        print("-- Chapter 1 --".center(80))
-        print("\n")
-        self.wait(5)
-        print("This story is set in the United States of America.\n".center(80))
-        self.wait(3)
-        print("You and Tyler are best friends.\n".center(80))
-        self.wait(3)
-        print("Together with Tyler and your brother Evan,".center(80), end="") 
-        print("you are going to see a movie in the cinema.\n".center(80))
-        print("\n\n\n\n\n\n\n\n")
-        input("")
-        self.clr()
-
-        #Subchapter a_1
-        self.chapter = "a_1"
-        q_string = self.option_1("You are sitting in the cinema. The movie hasn't started yet.", "talk/walk/wait")
-        while not(self.a_1(q_string)):
-            q_string = self.option_1("You are sitting in the cinema. The movie hasn't started yet.", "talk/walk/wait")
-        self.clr_dash()
-        input("")
-
-        #Subchapter a_1
-        self.chapter = "a_2"
-        q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
-        while not(self.a_2(q_string)):
-            q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
-        self.clr_dash()
-        input("")
-
-
+    
     
     #Main method for running the game    
     def start(self):
@@ -167,6 +251,3 @@ class Invasion():
                 self.show_infoscreen()
             else:
                 self.name = "Daniel"
-
-        #Continue.
-        self.chapter_a()
