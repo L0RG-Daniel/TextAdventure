@@ -1,10 +1,12 @@
 import os
 import time
-
-debug = True
+from Person import *
 
 class Invasion():
     def __init__(self):
+
+        #Variable for easy debugging.
+        self.debug = True
         
         #Print starting screen
         print("\n\n")
@@ -22,13 +24,15 @@ class Invasion():
         self.name = ""
         self.chapter = ""
         self.finished = False
+        self.chapters = [1, 2, 3, 4]
+        self.companions = []
         
         #Prepare screen for game
         os.system('cls')
     
     #Method for delay/clearing
     def wait(self, t):
-        if not debug:
+        if not self.debug:
             time.sleep(t)
 
     def clr(self):
@@ -128,11 +132,9 @@ class Invasion():
         q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
         while not(self.a_2(q_string)):
             q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
-        self.health = self.health - 90
+        self.health -= 90
         input("")
         self.clr()
-
-        return True
 
     #Method for mall chapter
     def mall_chapter(self):
@@ -234,7 +236,9 @@ class Invasion():
     def a_2(self, opt):
         if opt == "talk":
             self.story_3((self.name.title() + ": What the hell is going on?!"), "And what is that guy on the front row even doing?", "Tyler: I didn't even notice him until now. Sir. SIR! EXCUSE ME!")
-            #Show more text, meet person and add to journey.
+            self.story_3("Alex: Hi! Do you kids have any idea what's going on?", (self.name.title() + ": No, but let's find that out later!"), "Alex: Smart idea. I'll join you guys!")
+            p1 = Person("Alex", 80, "good", "dmg")
+            self.companions.append(p1)
             return True
         elif opt == "run":
             self.story_2((self.name.title() + ": Guys, let's get out of here ASAP."), "Tyler: Smart words, this seems unsafe!")
@@ -247,7 +251,7 @@ class Invasion():
     def start(self):
         #Check for savefiles.
         if not (self.show_loadscreen()):
-            if not debug:
+            if not self.debug:
                 self.show_infoscreen()
             else:
                 self.name = "Daniel"
