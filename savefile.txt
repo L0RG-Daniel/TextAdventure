@@ -1,5 +1,4 @@
-name=Daniel
-health=100
-chapter=0
+name=
+health=10
+chapter=1
 finished=False
-chapters=1,2,3,4

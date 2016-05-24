@@ -4,6 +4,7 @@ import re
 from Person import *
 from Food import *
 from Inventory import *
+from Fight import *
 
 class Invasion():
     def __init__(self):
@@ -194,6 +195,13 @@ class Invasion():
         print(line1.center(80))
         print(line2.center(80))
         print(line3.center(80))
+        
+    #Check if input is correct.
+    def is_valid(self, x):
+        if x in ('y', 'yes', 'n', 'no'):
+            return True
+        else:
+            return False
 
     #Method for introduction chapter
     def intro_chapter(self):
@@ -213,14 +221,14 @@ class Invasion():
         input("")
         self.clr()
 
-        #Subchapter a_1
+        #Subchapter 0.1
         q_string = self.option_1("You are sitting in the cinema. The movie hasn't started yet.", "talk/walk/wait")
         while not(self.a_1(q_string)):
             q_string = self.option_1("You are sitting in the cinema. The movie hasn't started yet.", "talk/walk/wait")
         input("")
         self.clr()
 
-        #Subchapter a_1
+        #Subchapter 0.2
         q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
         while not(self.a_2(q_string)):
             q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
@@ -229,6 +237,34 @@ class Invasion():
         self.clr()
 
         self.chapter = 1
+
+    #Methods for choices in intro chapter
+    def a_1(self, opt):
+        if opt == "talk":
+            self.story_2((self.name.title() + ": Damn, this is taking long. I wish this movie would start already!"), "Tyler: Dude, be patient. It will probably start in 5 minutes.")
+            return True
+        elif opt == "walk":
+            self.story_3((self.name.title() + ": I'm going around for a walk now, I'll be right back."), "You find a box of popcorn. After that, you walk over to the door.", "Huh? The doors are locked!")
+            f1 = Food("popcorn", 2, 25, 1)
+            self.inv.items.append(f1)
+            return True
+        elif opt == "wait":
+            self.story_2("You decide to be patient, good choice.", "After all, you are not in a rush, right?")
+            return True
+        else:
+            return False
+    def a_2(self, opt):
+        if opt == "talk":
+            self.story_3((self.name.title() + ": What the hell is going on?!"), "And what is that guy on the front row even doing?", "Tyler: I didn't even notice him until now. Sir. SIR! EXCUSE ME!")
+            self.story_3("Alex: Hi! Do you kids have any idea what's going on?", (self.name.title() + ": No, but let's find that out later!"), "Alex: Smart idea. I'll join you guys!")
+            p1 = Person("Alex", 80, "good", "dmg")
+            self.companions.append(p1)
+            return True
+        elif opt == "run":
+            self.story_2((self.name.title() + ": Guys, let's get out of here ASAP."), "Tyler: Smart words, this seems unsafe!")
+            return True
+        else:
+            return False
 
     #Method for mall chapter
     def mall_chapter(self):
@@ -249,6 +285,65 @@ class Invasion():
         print("\n\n\n")
         input("")
         self.clr()
+
+        #Subchapter 2.1
+        q_string = self.option_1("You enter the mall. Where do you want to go?", "left/right")
+        while not(self.b_1(q_string)):
+            q_string = self.option_1("You enter the mall. Where do you want to go?", "left/right")
+        input("")
+        self.clr()
+
+
+        self.chapter = 2
+
+    #Methods for choices in mall_chapter
+    def b_1(self, opt):
+        if opt in ('l', 'left'):
+            self.story_2("You go to the left.", "Suddenly, a mysterious figure shows up!")
+            input("")
+            self.clr()
+            p2 = Person("Alison", 50, 10, "good", "healing")
+            
+            def b_1_1(opt2):
+                if opt2 in ('y', 'yes'):
+                    self.story_2("You slowly approach the mysterious figure.", (self.name.title() + ": Ahem. Excuse me?"))
+                    input("")
+                    self.story_3("The figure slowly walks towards your group.", "As the figure comes closer, you see that it is a crying woman!", "She seems very sad.")
+                    input("")
+                    #Continue storyline with hints
+                    #Add person to companions
+                    #Give bonus healing (used to be a nurse)
+                    return True
+                elif opt2 in ('n','no'):
+                    self.story_2("As your group slowly tries to walk away, Evan steps on broken glass.", "The mysterious figure turns around and charges you!")
+                    input("")
+
+                    self.clr()
+                    p2.status = "evil"
+                    fight = Fight(self.name, self.health, self.inv, self.companions, p2)
+                    fight.start()
+                    
+                    #Start fight with woman
+                    #Evan dies
+                    #Does major damage to group
+                    return True
+                else:
+                    return False
+
+            q_string = self.option_1("Do you approach the figure?", "yes/no")
+            while not(b_1_1(q_string)):
+                q_string = self.option_1("Do you approach the figure?", "yes/no")
+            input("")
+            self.clr()
+
+            return True
+        elif opt in ('r', 'right'):
+            self.clr()
+            print("We're going right!")
+            return True
+        else:
+            return False
+
 
     #Method for supermarket chapter
     def supermarket_chapter(self):
@@ -314,33 +409,7 @@ class Invasion():
     def final_chapter(self):
         self.finished = True
 
-    #Methods for each choice in storyline
-    def a_1(self, opt):
-        if opt == "talk":
-            self.story_2((self.name.title() + ": Damn, this is taking long. I wish this movie would start already!"), "Tyler: Dude, be patient. It will probably start in 5 minutes.")
-            return True
-        elif opt == "walk":
-            self.story_3((self.name.title() + ": I'm going around for a walk now, I'll be right back."), "You find a box of popcorn. After that, you walk over to the door.", "Huh? The doors are locked!")
-            f1 = Food("popcorn", 2, 25, 1)
-            self.inv.items.append(f1)
-            return True
-        elif opt == "wait":
-            self.story_2("You decide to be patient, good choice.", "After all, you are not in a rush, right?")
-            return True
-        else:
-            return False
-    def a_2(self, opt):
-        if opt == "talk":
-            self.story_3((self.name.title() + ": What the hell is going on?!"), "And what is that guy on the front row even doing?", "Tyler: I didn't even notice him until now. Sir. SIR! EXCUSE ME!")
-            self.story_3("Alex: Hi! Do you kids have any idea what's going on?", (self.name.title() + ": No, but let's find that out later!"), "Alex: Smart idea. I'll join you guys!")
-            p1 = Person("Alex", 80, "good", "dmg")
-            self.companions.append(p1)
-            return True
-        elif opt == "run":
-            self.story_2((self.name.title() + ": Guys, let's get out of here ASAP."), "Tyler: Smart words, this seems unsafe!")
-            return True
-        else:
-            return False
+    
     
     
     #Main method for running the game    
