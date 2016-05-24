@@ -6,10 +6,12 @@ game = adv.Invasion()
 game.start()
 
 #Check if the player is still alive and well
-while (game.health > 0 and game.finished == False):
+while not game.finished:
+
+    game.save_progress()
 
     #Only run intro chapter on new game.
-    if not (game.chapter  > "a"):
+    if not (game.chapter > 0):
         game.intro_chapter()
     else:
         #Choose a random new chapter out of the remaining chapters.

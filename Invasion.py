@@ -1,12 +1,16 @@
 import os
 import time
+import re
 from Person import *
+from Food import *
+from Inventory import *
 
 class Invasion():
     def __init__(self):
 
         #Variable for easy debugging.
-        self.debug = True
+        self.debug = False
+        self.sleep = False
         
         #Print starting screen
         print("\n\n")
@@ -22,10 +26,11 @@ class Invasion():
         #Set game variables
         self.health = 100
         self.name = ""
-        self.chapter = ""
+        self.chapter = 0
         self.finished = False
         self.chapters = [1, 2, 3, 4]
         self.companions = []
+        self.inv = Inventory()
         
         #Prepare screen for game
         os.system('cls')
@@ -33,7 +38,8 @@ class Invasion():
     #Method for delay/clearing
     def wait(self, t):
         if not self.debug:
-            time.sleep(t)
+            if self.sleep:
+                time.sleep(t)
 
     def clr(self):
         os.system('cls')
@@ -45,14 +51,64 @@ class Invasion():
     #Method for displaying loading screen
     def show_loadscreen(self):
         if (os.path.isfile("savefile.txt")):
-            result = input("A savefile was found. Load this file? (y/n)")
+            print("\n\n")
+            print("A savefile was found. Load this file? (y/n)".center(80))
+            result = input("".center(80))
+            
+            #If the player wants to load a savefile:
             if result == 'y':
-                print("yes!")
+                #Retrieve all info from savefile.txt
+                with open("savefile.txt", "r") as save_file:
+                    game_state = []
+                    for line in save_file:
+                        values = line.split("=")
+                        game_state.append({'var': values[0], 'value': values[1].rstrip()})
+                    print(game_state)
+
+                    #Load values into game
+                    for entry in game_state:
+                        if entry['var'] == 'name':
+                            self.name = entry['value']
+                        elif entry['var'] == 'health':
+                            self.health = int(entry['value'])
+                        elif entry['var'] == 'chapter':
+                            self.chapter = int(entry['value'])
+                        elif entry['var'] == 'finished':
+                            if entry['value'] == 'True':
+                                self.finished = True
+                            else:
+                                self.finished = False
+                        elif entry['var'] == 'chapters':
+                            temp_arr = re.split(",", entry['value'])
+                            self.chapters[:] = []
+                            for item in temp_arr:
+                                self.chapters.append(int(item))
+                            print(self.chapters)
+                        else:
+                            pass
+
+                        '''
+                        self.chapters = [1, 2, 3, 4]
+                        self.companions = []
+                        self.inv = Inventory()
+                        '''
+
+                input("")
+                self.clr()
+
+            #If the player chooses to play new game or input is incorrect:
             elif result == 'n':
-                print("no!")
+                self.clr()
+                print("\n\n")
+                print("No savefile was loaded.".center(80))
+                self.wait(4)
+                self.clr()
             else:
-                print("incorrect input")
+                self.clr()
+                self.show_loadscreen()
             return True
+
+        #Savefile doesn't exist, skip to introduction directly.
         else:
             return False
 
@@ -66,6 +122,44 @@ class Invasion():
         print(("Okay, " + self.name + ", welcome to this game!").center(80))
         self.wait(2)
         self.clr()
+
+    #Method for saving progress after each chapter
+    def save_progress(self):
+        self.clr()
+        print("\n\n")
+        print("Do you want to save the game at this point? (yes/no)".center(80))
+        print("Note: Game can only be saved after finishing a chapter.".center(80))
+        res = input("                                                                          \n                                    ")
+
+        if res in ('y', 'yes'):
+            #Clear savefile.
+            open("savefile.txt", 'w').close()
+
+            #Write new data to file.
+            with open("savefile.txt", 'w') as save_file:
+                save_file.write("name=" + self.name + "\n")
+                save_file.write("health=" + str(self.health) + "\n")
+                save_file.write("chapter=" + str(self.chapter) + "\n")
+                if self.finished == True:
+                    save_file.write("finished=True\n")
+                else:
+                    save_file.write("finished=False\n")
+                ch_string = str(self.chapters[0])
+                for i in range(1, len(self.chapters)):
+                    ch_string += ("," + str(self.chapters[i]))
+                save_file.write("chapters=" + ch_string + "\n")
+
+        #Don't save, notify user.
+        elif res in ('n', 'no'):
+            self.clr()
+            print("\n\n")
+            print("Progress was not saved.".center(80))
+            self.wait(4)
+        else:
+            self.clr()
+            self.save_progress()
+
+        input("")
 
     #Method for printing option screen with 1 line of description
     def option_1(self, desc, opt):
@@ -120,7 +214,6 @@ class Invasion():
         self.clr()
 
         #Subchapter a_1
-        self.chapter = "a_1"
         q_string = self.option_1("You are sitting in the cinema. The movie hasn't started yet.", "talk/walk/wait")
         while not(self.a_1(q_string)):
             q_string = self.option_1("You are sitting in the cinema. The movie hasn't started yet.", "talk/walk/wait")
@@ -128,13 +221,14 @@ class Invasion():
         self.clr()
 
         #Subchapter a_1
-        self.chapter = "a_2"
         q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
         while not(self.a_2(q_string)):
             q_string = self.option_2("Suddenly, the lights go out and the ground starts shaking!", "Evan: Help, what is going on?!", "talk/run")
         self.health -= 90
         input("")
         self.clr()
+
+        self.chapter = 1
 
     #Method for mall chapter
     def mall_chapter(self):
@@ -226,7 +320,9 @@ class Invasion():
             self.story_2((self.name.title() + ": Damn, this is taking long. I wish this movie would start already!"), "Tyler: Dude, be patient. It will probably start in 5 minutes.")
             return True
         elif opt == "walk":
-            self.story_3((self.name.title() + ": I'm going around for a walk now, I'll be right back."), "You walk over to the double doors of the cinema.", "Huh? The doors are locked!")
+            self.story_3((self.name.title() + ": I'm going around for a walk now, I'll be right back."), "You find a box of popcorn. After that, you walk over to the door.", "Huh? The doors are locked!")
+            f1 = Food("popcorn", 2, 25, 1)
+            self.inv.items.append(f1)
             return True
         elif opt == "wait":
             self.story_2("You decide to be patient, good choice.", "After all, you are not in a rush, right?")

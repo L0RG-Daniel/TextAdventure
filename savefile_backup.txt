@@ -1,0 +1,5 @@
+name=Daniel
+health=100
+chapter=1
+finished=False
+chapters=2,3
