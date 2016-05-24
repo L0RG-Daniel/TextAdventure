@@ -8,7 +8,7 @@ game.start()
 #Check if the player is still alive and well
 while not game.finished:
 
-    game.save_progress()
+    game.b_1("left")
 
     #Only run intro chapter on new game.
     if not (game.chapter > 0):
@@ -33,6 +33,8 @@ while not game.finished:
         else:
             #Run the final chapter of the game.
             game.final_chapter()
+    
+    game.save_progress()
 
 #Game is now finished.
 game.clr()
