@@ -133,6 +133,7 @@ class Fight():
             if self.enemy.health < 1:
                 self.over = True
                 print("     You killed the enemy!")
+                input("")
 
             if self.p_health < 1:
                 self.over = True
@@ -141,5 +142,6 @@ class Fight():
                 print("\n\n")
                 print("Oh, no!".center(80))
                 print("The enemy killed you!".center(80))
+                input("")
 
         return self.lost
