@@ -1,3 +1,12 @@
+'''
+Programming in Python - Project
+Student: Daniel Hartgers
+Number: 941215-T137, 10694244
+Description:
+This is a Python Console Text Adventure.
+The user can play the game by entering text commands.
+'''
+
 import Invasion as adv
 import random
 
@@ -7,8 +16,6 @@ game.start()
 
 #Check if the player is still alive and well
 while not game.finished:
-
-    game.b_1("left")
 
     #Only run intro chapter on new game.
     if not (game.chapter > 0):
@@ -34,8 +41,8 @@ while not game.finished:
             #Run the final chapter of the game.
             game.final_chapter()
     
-    game.save_progress()
+        if not game.finished:
+            game.save_progress()
 
 #Game is now finished.
-game.clr()
-print("GAME DONE MF")
+game.end_screen()
