@@ -50,20 +50,22 @@ class Invasion():
 
     #Method for displaying loading screen
     def show_loadscreen(self):
-        if (os.path.isfile("savefile.txt")):
+        if (os.path.isfile("savefile.txt") and not self.finished):
             print("\n\n")
-            print("A savefile was found. Load this file? (y/n)".center(80))
-            result = input("".center(80))
+            print("A savefile was found. Load this file? (yes/no)".center(80))
+            result = input("                                                                             \n                                     ")
             
             #If the player wants to load a savefile:
-            if result == 'y':
+            if result in ('y','yes'):
                 #Retrieve all info from savefile.txt
                 with open("savefile.txt", "r") as save_file:
                     game_state = []
                     for line in save_file:
                         values = line.split("=")
                         game_state.append({'var': values[0], 'value': values[1].rstrip()})
-                    print(game_state)
+                    
+                    #Create temporary Inventory, fill this inv with items from savefile.
+                    tmp_inv = Inventory()
 
                     #Load values into game
                     for entry in game_state:
@@ -78,35 +80,61 @@ class Invasion():
                                 self.finished = True
                             else:
                                 self.finished = False
+                        #Loop through chapters and split where necessary
                         elif entry['var'] == 'chapters':
                             temp_arr = re.split(",", entry['value'])
                             self.chapters[:] = []
                             for item in temp_arr:
-                                self.chapters.append(int(item))
-                            print(self.chapters)
+                                try:
+                                    self.chapters.append(int(item))
+                                except ValueError:
+                                    pass
+                        elif entry['var'] == 'invsize':
+                            tmp_inv.size = int(entry['value'])
+                        #Loop through all items in inventory and split where necessary
+                        elif entry['var'] == 'items':
+                            temp_items = re.split("/", entry['value'])
+
+                            #An item can be of 3 types (Regular, food, weapon)
+                            #Each one needs to be loaded differently, check for this.
+                            for item in temp_items:
+                                itm = re.split(",", item)
+                                if itm[0] == 'w':
+                                    temp_wpn = Weapon(itm[1],int(itm[2]),int(itm[3]))
+                                    tmp_inv.items.append(temp_wpn)
+                                elif itm[0] == 'f':
+                                    temp_food = Food(itm[1], int(itm[2]), int(itm[3]), int(itm[4]))
+                                    tmp_inv.items.append(temp_food)
+                                else:
+                                    temp_itm = Item(itm[1], int(item[2]))
+                                    tmp_inv.items.append(temp_itm)
+                            self.inv = tmp_inv
                         else:
                             pass
 
                         '''
-                        self.chapters = [1, 2, 3, 4]
                         self.companions = []
-                        self.inv = Inventory()
                         '''
-
-                input("")
-                self.clr()
+                    #Notify user that savefile has been loaded.
+                    self.clr()
+                    print("\n\n")
+                    print("Your savefile was loaded.".center(80))
+                    input("")
+                    self.clr()
+                return True
 
             #If the player chooses to play new game or input is incorrect:
-            elif result == 'n':
+            elif result in ('n', 'no'):
                 self.clr()
                 print("\n\n")
                 print("No savefile was loaded.".center(80))
-                self.wait(4)
+                input("")
                 self.clr()
+                return False
             else:
                 self.clr()
                 self.show_loadscreen()
-            return True
+                return True
 
         #Savefile doesn't exist, skip to introduction directly.
         else:
@@ -115,7 +143,12 @@ class Invasion():
     #Method for displaying infoscreen
     def show_infoscreen(self):
         print("\n\n\n")
-        self.name = input("What is your name?\n    ".center(80))
+        tmp_name = input("What is your name?\n    ".center(80))
+        while not tmp_name:
+            self.clr()
+            print("\n\n\n")
+            tmp_name = input("What is your name?\n    ".center(80))
+        self.name = tmp_name
         self.clr()
 
         print("\n\n\n")
@@ -140,14 +173,38 @@ class Invasion():
                 save_file.write("name=" + self.name + "\n")
                 save_file.write("health=" + str(self.health) + "\n")
                 save_file.write("chapter=" + str(self.chapter) + "\n")
+                
+                #Write finished
                 if self.finished == True:
                     save_file.write("finished=True\n")
                 else:
                     save_file.write("finished=False\n")
-                ch_string = str(self.chapters[0])
+                
+                #Write chapters (list format)
+                ch_string = ""
+                try:
+                    ch_string = str(self.chapters[0])
+                except IndexError:
+                    pass
                 for i in range(1, len(self.chapters)):
                     ch_string += ("," + str(self.chapters[i]))
                 save_file.write("chapters=" + ch_string + "\n")
+
+                #Write inventory
+                save_file.write("invsize=" + str(self.inv.size) + "\n")
+                inv_string = ""
+                item_string = ""
+                for i in range(0, len(self.inv.items)):
+                    item = self.inv.items[i]
+                    if isinstance(item, Weapon):
+                        item_string = ("w,"+item.name+","+str(item.weight)+","+str(item.eff)+"/")
+                    elif isinstance(item, Food):
+                        item_string = ("f,"+item.name+","+str(item.weight)+","+str(item.eff)+","+str(item.amount)+"/")
+                    else:
+                        item_string = ("i,"+item.name+","+str(item.weight)+"/")
+                    inv_string += item_string
+                inv_string = inv_string[:-1]
+                save_file.write("items=" + inv_string + "\n")
 
         #Don't save, notify user.
         elif res in ('n', 'no'):
@@ -297,7 +354,7 @@ class Invasion():
             self.story_2("You go to the left.", "Suddenly, a mysterious figure shows up!")
             input("")
             self.clr()
-            p2 = Person("Alison", 50, 100, "good", "healing")
+            p2 = Person("Alison", 50, 10, "good", "healing")
             
             def b_1_1(opt2):
                 if opt2 in ('y', 'yes'):
@@ -305,9 +362,14 @@ class Invasion():
                     input("")
                     self.story_3("The figure slowly walks towards your group.", "As the figure comes closer, you see that it is a crying woman!", "She seems very sad.")
                     input("")
-                    #Continue storyline with hints
-                    #Add person to companions
-                    #Give bonus healing (used to be a nurse)
+                    self.story_3("Alison: C-Can you guys h-help me?", (self.name.title() + ": Yes, of course! What's going on?"), "Alison: I was j-just buying some clothes!")
+                    input("")
+                    self.story_3("Alison: When I went into a changing booth, everyone suddenly disappeared!", "Alison: While I was changing, I heard some loud monster-like noises.", "Evan: And did you notice the earthquake?")
+                    input("")
+                    self.story_3("Alison: Earthquake? No?!", "Alex: ..Something bad happened for sure.", "Tyler: Let's figure this stuff out soon.")
+                    input("")
+                    self.story_3("Alison: I will join your group, if that's ok.", "Alison: I used to be a nurse, maybe I can be helpful.", (self.name.title() + ": Sure, you can join us!"))
+                    self.companions.append(p2)
                     return True
                 elif opt2 in ('n','no'):
                     self.story_2("As your group slowly tries to walk away, Evan steps on broken glass.", "The mysterious figure turns around and charges you!")
@@ -318,8 +380,22 @@ class Invasion():
                     fight = Fight(self.name, self.health, self.inv, self.companions, p2)
                     if (fight.start() == True):
                         self.finished = True
-                    
-                    #Does major damage to group
+                    else:
+                        self.story_2((self.name.title() + ": Wow, that was crazy!"), (self.name.title() + ": Is everyone OK?"))
+                        input("")
+                        alex = False
+                        for ally in self.companions:
+                            if ally.name == 'Alex':
+                                alex = True
+                                ally.health -= 80
+                                if ally.health < 1:
+                                    self.story_2("Evan: Oh no.. Alex.. ALEX!", "Tyler: Sorry guys, Alex is gone.")
+                                else:
+                                    self.story_2("Evan: Alex, are you allright?", "Alex: Well, I'm alive, but I took some serious damage.")
+                                break
+                        if not alex:
+                            self.story_2("Evan: Yeah, I'm good.", "Tyler: I'm fine as well!")
+
                     return True
                 else:
                     return False

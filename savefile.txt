@@ -1,4 +1,7 @@
-name=
+name=Kanker
 health=10
-chapter=1
-finished=False
+chapter=2
+finished=True
+chapters=
+invsize=25
+items=f,apple,1,30,1/f,bread,3,50,2/w,Fists,0,10/w,knife,2,25

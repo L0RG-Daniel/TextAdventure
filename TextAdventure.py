@@ -20,6 +20,7 @@ while not game.finished:
     #Only run intro chapter on new game.
     if not (game.chapter > 0):
         game.intro_chapter()
+        game.save_progress()
     else:
         #Choose a random new chapter out of the remaining chapters.
         if len(game.chapters) > 0:
@@ -37,12 +38,13 @@ while not game.finished:
 
             #Remove played chapter from the list.
             game.chapters.remove(next_ch)
+            if len(game.chapters) == 0:
+                game.finished = True
+            game.save_progress()
         else:
             #Run the final chapter of the game.
-            game.final_chapter()
-    
-        if not game.finished:
             game.save_progress()
+            game.final_chapter()
 
 #Game is now finished.
 game.end_screen()
