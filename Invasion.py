@@ -41,7 +41,6 @@ class Invasion():
         if not self.debug:
             if self.sleep:
                 time.sleep(t)
-
     def clr(self):
         os.system('cls')
     
@@ -160,8 +159,6 @@ class Invasion():
             self.clr()
             self.save_progress()
 
-        input("")
-
     #Method for printing option screen with 1 line of description
     def option_1(self, desc, opt):
         self.clr()
@@ -257,7 +254,7 @@ class Invasion():
         if opt == "talk":
             self.story_3((self.name.title() + ": What the hell is going on?!"), "And what is that guy on the front row even doing?", "Tyler: I didn't even notice him until now. Sir. SIR! EXCUSE ME!")
             self.story_3("Alex: Hi! Do you kids have any idea what's going on?", (self.name.title() + ": No, but let's find that out later!"), "Alex: Smart idea. I'll join you guys!")
-            p1 = Person("Alex", 80, "good", "dmg")
+            p1 = Person("Alex", 80, 10, "good", "dmg")
             self.companions.append(p1)
             return True
         elif opt == "run":
@@ -290,9 +287,7 @@ class Invasion():
         q_string = self.option_1("You enter the mall. Where do you want to go?", "left/right")
         while not(self.b_1(q_string)):
             q_string = self.option_1("You enter the mall. Where do you want to go?", "left/right")
-        input("")
         self.clr()
-
 
         self.chapter = 2
 
@@ -302,7 +297,7 @@ class Invasion():
             self.story_2("You go to the left.", "Suddenly, a mysterious figure shows up!")
             input("")
             self.clr()
-            p2 = Person("Alison", 50, 10, "good", "healing")
+            p2 = Person("Alison", 50, 100, "good", "healing")
             
             def b_1_1(opt2):
                 if opt2 in ('y', 'yes'):
@@ -321,15 +316,15 @@ class Invasion():
                     self.clr()
                     p2.status = "evil"
                     fight = Fight(self.name, self.health, self.inv, self.companions, p2)
-                    fight.start()
+                    if (fight.start() == True):
+                        self.finished = True
                     
-                    #Start fight with woman
-                    #Evan dies
                     #Does major damage to group
                     return True
                 else:
                     return False
 
+            #Trigger next event.
             q_string = self.option_1("Do you approach the figure?", "yes/no")
             while not(b_1_1(q_string)):
                 q_string = self.option_1("Do you approach the figure?", "yes/no")
@@ -409,8 +404,23 @@ class Invasion():
     def final_chapter(self):
         self.finished = True
 
-    
-    
+    #Method for end screen
+    def end_screen(self):
+        self.clr()
+        print("\n\n")
+        print("       !@#$%  &    !  $       /     ^       {+%#   AAAAA    AAA   &    !     ")
+        print("         *    $#   @   %     }     & @     @         A     A   A  $#   @     ")
+        print("         %    % $  #    (   ?     ; - +     >&^#     A     A   A  % $  #     ")
+        print("         #    ^  ( $     = `     -     $        ~    A     A   A  ^  ( $     ")
+        print("       ^*(%#  *   +$      #     *       #   )+!?   AAAAA    AAA   *   +$     ")
+        print("                                                                             ")
+        print("\n\n")
+        print(("Dear "+self.name.title()+",").center(80))
+        print("\n")
+        print("Thank you for playing this game!".center(80))
+        print("You can replay this game if you want to,".center(80))
+        print("there is probably a lot more to explore!".center(80))    
+        input("")
     
     #Main method for running the game    
     def start(self):
