@@ -14,13 +14,6 @@ import random
 game = adv.Invasion()
 game.start()
 
-#Demo
-'''
-game.mall_chapter()
-game.finished=True
-game.end_screen()
-'''
-
 #Check if the player is still alive and well
 while not game.finished:
 
@@ -45,13 +38,11 @@ while not game.finished:
 
             #Remove played chapter from the list.
             game.chapters.remove(next_ch)
-            if len(game.chapters) == 0:
-                game.finished = True
             game.save_progress()
         else:
             #Run the final chapter of the game.
-            game.save_progress()
             game.final_chapter()
+            game.save_progress()
 
 #Game is now finished.
 game.end_screen()

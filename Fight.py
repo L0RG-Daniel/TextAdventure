@@ -2,7 +2,7 @@ import os
 from Weapon import *
 from Food import *
 
-class Fight():
+class Fight:
     def __init__(self, p_name, p_health, p_inv, p_comp, NPC):
         self.p_name = p_name
         self.p_health = p_health
@@ -15,6 +15,7 @@ class Fight():
         self.lost = False
         self.curr_weapon = Weapon("Fists", 0, 10)
 
+        #If player has other weapons in inventory, select first weapon
         for item in self.p_inv.items:
             if isinstance(item, Weapon):
                 self.curr_weapon = item
@@ -37,11 +38,11 @@ class Fight():
         print("-- Items --")
         for i in range(0,len(self.p_inv.items)):
             if self.curr_weapon == self.p_inv.items[i]:
-                print(str(i+1) + ": " + self.p_inv.items[i].name.title() + ", damage: " + str(self.p_inv.items[i].eff) + ", currently equipped.")
+                print(str(i+1) + self.p_inv.items[i].get_wpn() + ", currently equipped.")
             elif isinstance(self.p_inv.items[i], Weapon):
-                print(str(i+1) + ": " + self.p_inv.items[i].name.title() + ", damage: " + str(self.p_inv.items[i].eff))
+                print(str(i+1) + self.p_inv.items[i].get_wpn())
             elif isinstance(self.p_inv.items[i], Food):
-                print(str(i+1) + ": " + self.p_inv.items[i].name.title() + ", heals: " + str(self.p_inv.items[i].eff) + ", amount left: " + str(self.p_inv.items[i].amount))
+                print(str(i+1) + self.p_inv.items[i].get_food())
             else:
                 print(str(i+1) + ": " + self.p_inv.items[i].name.title())
 
@@ -56,15 +57,18 @@ class Fight():
     #Method for starting a fight, eventually a winner will arise.
     def start(self):
 
-        #Loop through item list
-        #Select the weapon
-
+        #Keep fighting until game is over.
         while not self.over:
+
+            #Notify user about game status.
             self.game_status()
 
+            #Player's turn
             if self.turn == 'P':
                 print("")
                 res = input("     What do you want to do? (att/items): ")
+
+                #Select if player wants to attack or choose items.
                 while not res in ('att', 'items'):
                     self.game_status()
                     print("")
@@ -74,6 +78,8 @@ class Fight():
                     self.clr()
                     total_dmg = self.curr_weapon.eff
                     bonus_dmg = 0
+
+                    #Add bonus damage if there's a companion with that bonus.
                     for comp in self.p_comp:
                         if comp.bonus == "dmg":
                             total_dmg += comp.eff
@@ -82,6 +88,7 @@ class Fight():
                         else:
                             pass
 
+                    #Execute fight
                     self.enemy.health -= total_dmg
                     if self.enemy.health < 0:
                         self.enemy.health = 0
@@ -93,8 +100,8 @@ class Fight():
                     print("     Enemy health is now " + str(self.enemy.health) + "/" + str(self.ene_start_hp) + ".")
                     input("")
                 else:
+                    #Show all items in player's inventory
                     self.show_items()
-                        
                     q = input("Select item: ")
                     corr = False
                     ind = 0
@@ -110,6 +117,7 @@ class Fight():
                             self.show_items()
                             q = input("Select item: ")                    
                     item = self.p_inv.items[ind-1]
+                    #Wield weapon and notify user.
                     if isinstance(item, Weapon):
                         if item == self.curr_weapon:
                             print("This item is already equipped!")
@@ -118,9 +126,12 @@ class Fight():
                             self.curr_weapon = item
                             print(item.name.title() + " with damage " + str(item.eff) + " is now equipped!")
                             input("")
+                    #Eat food and notify user.
                     elif isinstance(item, Food):
                         total_heal = item.eff
                         bonus_heal = 0
+
+                        #Heal extra if there's a companion with healing bonus.
                         for comp in self.p_comp:
                             if comp.bonus == "heal":
                                 total_heal += comp.eff
@@ -129,7 +140,10 @@ class Fight():
                             else:
                                 pass
 
+                        #Execute healing actions
                         self.p_health += total_heal
+                        if self.p_health > 100:
+                            self.p_health = 100
                         print(item.name.title()+" has healed "+str(item.eff)+" + "+str(bonus_heal)+" bonus health!")
                         item.amount -=1
                         if item.amount == 0:
@@ -140,14 +154,16 @@ class Fight():
                         self.clr()
                         print("Prof. Oak: Now is not the time to use that!")
                         input("")
+
+                #Switch turns
                 self.switch()
 
             else:
                 #Enemy turn.
                 self.clr()
-                self.p_health -= self.enemy.dmg
+                self.p_health -= self.enemy.eff
                 print("")
-                print("     (" + self.enemy.name.title() + ") has hit you for " + str(self.enemy.dmg) + " damage!")
+                print("     (" + self.enemy.name.title() + ") has hit you for " + str(self.enemy.eff) + " damage!")
                 self.switch()
                 input("")
                 

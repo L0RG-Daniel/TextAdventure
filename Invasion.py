@@ -5,13 +5,10 @@ from Person import *
 from Food import *
 from Inventory import *
 from Fight import *
+from NPC import *
 
-class Invasion():
+class Invasion:
     def __init__(self):
-
-        #Variable for easy debugging.
-        self.debug = False
-        self.sleep = False
         
         #Print starting screen
         print("\n\n")
@@ -32,15 +29,19 @@ class Invasion():
         self.chapters = [1, 2, 3, 4]
         self.companions = []
         self.inv = Inventory()
+
+        #Give the player a small boost in the beginning
+        i1 = Food("apple", 1, 15, 3)
+        i2 = Food("sandwich", 3, 30, 1)
+        i3 = Weapon("shotgun", 10, 25)
+        self.inv.items.append(i1)
+        self.inv.items.append(i2)
+        self.inv.items.append(i3)
         
         #Prepare screen for game
         os.system('cls')
     
-    #Method for delay/clearing
-    def wait(self, t):
-        if not self.debug:
-            if self.sleep:
-                time.sleep(t)
+    #Method for clearing
     def clr(self):
         os.system('cls')
     
@@ -128,9 +129,6 @@ class Invasion():
                         else:
                             pass
 
-                        '''
-                        self.companions = []
-                        '''
                     #Notify user that savefile has been loaded.
                     self.clr()
                     print("\n\n")
@@ -169,7 +167,12 @@ class Invasion():
 
         print("\n\n\n")
         print(("Okay, " + self.name + ", welcome to this game!").center(80))
-        self.wait(2)
+        print("")
+        print(("You can always continue by pressing the Enter key. Try it!").center(80))
+        input("")
+        print("")
+        print(("Good job, let's get started!").center(80))
+        input("")
         self.clr()
 
     #Method for saving progress after each chapter
@@ -213,9 +216,9 @@ class Invasion():
                 for i in range(0, len(self.inv.items)):
                     item = self.inv.items[i]
                     if isinstance(item, Weapon):
-                        item_string = ("w,"+item.name+","+str(item.weight)+","+str(item.eff)+"/")
+                        item_string = ("w,"+item.save_wpn())
                     elif isinstance(item, Food):
-                        item_string = ("f,"+item.name+","+str(item.weight)+","+str(item.eff)+","+str(item.amount)+"/")
+                        item_string = ("f,"+item.save_food())
                     else:
                         item_string = ("i,"+item.name+","+str(item.weight)+"/")
                     inv_string += item_string
@@ -227,7 +230,7 @@ class Invasion():
                 comp_string = ""
                 for i in range(0, len(self.companions)):
                     comp = self.companions[i]
-                    comp_string = (comp.name+","+str(comp.health)+","+str(comp.dmg)+","+comp.status+","+comp.bonus+"/")   
+                    comp_string = (comp.name+","+str(comp.health)+","+str(comp.eff)+","+comp.status+","+comp.bonus+"/")   
                     list_string += comp_string
                 comp_string = comp_string[:-1]
                 save_file.write("companions=" + comp_string + "\n")
@@ -237,7 +240,7 @@ class Invasion():
             self.clr()
             print("\n\n")
             print("Progress was not saved.".center(80))
-            self.wait(4)
+            input("")
         else:
             self.clr()
             self.save_progress()
@@ -283,21 +286,35 @@ class Invasion():
         else:
             return False
 
+    #Method for apologizing :)
+    def sorry_Peter_LG(self):
+        print("\n")
+        print("     Unfortunately, this section has not been fully developed.")
+        print("     The programmer, Daniel, had to do all of the project on his own.")
+        print("")
+        print("     All of the functionality and technical aspects are there,")
+        print("     but the game lacks in content.")
+        print("")
+        print("     He sincerely apologises for this fact.")
+        print("     He is going to finish this game back home (NL), when he has a lot of time.")
+        print("     If the player is interested in playing the full game,")
+        print("     send the programmer an email.")
+        print("\n")
+        input("")
+        self.clr()
+
     #Method for introduction chapter
     def intro_chapter(self):
         print("\n\n")
         print("----- Introduction -----".center(80))
-        print("\n")
-        self.wait(5)
+        input("")
         print("This story is set in the United States of America.".center(80))
-        print("\n")
-        self.wait(3)
+        input("")
         print("You and Tyler are best friends.".center(80))
-        print("\n")
-        self.wait(3)
+        input("")
         print("Together with Tyler and your brother Evan,".center(80), end="") 
         print("you are going to see a movie in the cinema.".center(80))
-        print("\n\n\n\n\n")
+        print("\n\n\n\n")
         input("")
         self.clr()
 
@@ -354,28 +371,25 @@ class Invasion():
 
     #Method for mall chapter
     def mall_chapter(self):
+        self.clr()
         print("\n\n")
         print("----- The Shopping Mall -----".center(80))
-        print("\n")
-        self.wait(5)
+        input("")
         print("After a long walk, you arrive at a shopping mall.".center(80))
-        print("\n")
-        self.wait(3)
+        input("")
         print("The mall looks abandoned.".center(80))
-        print("\n")
-        self.wait(3)
+        input("")
         print("Tyler: We can probably find some clothing and weapons in there!".center(80)) 
-        print("\n")
-        self.wait(3)
+        input("")
         print("However, something seems off..".center(80))
         print("\n\n\n")
         input("")
         self.clr()
 
         #Subchapter 2.1
-        q_string = self.option_1("You enter the mall. Where do you want to go?", "left/right")
+        q_string = self.option_1("You enter the mall. Where do you want to go? (Left for more gameplay)", "left/right")
         while not(self.b_1(q_string)):
-            q_string = self.option_1("You enter the mall. Where do you want to go?", "left/right")
+            q_string = self.option_1("You enter the mall. Where do you want to go? (Left for more gameplay)", "left/right")
         self.clr()
 
         self.chapter = 2
@@ -444,8 +458,34 @@ class Invasion():
 
             return True
         elif opt in ('r', 'right'):
+            self.story_2("Evan: It's so dark here, I can't see anything!", "Tyler: Guys, let's check out that box over there!")
+            input("")
+            self.story_2((self.name.title() + ": Is that what I think it is?"), "Evan: Oh yes! A loot crate!")
+            input("")
             self.clr()
-            print("We're going right!")
+            print("\n\n")
+            print("     Congratulations, you found a loot crate!")
+            print("     The crate contains the following items: ")
+            print("     1. M16, damage: 35", end="")
+            input("")
+            print("     2. Knife, damage: 20", end="")
+            input("")
+            print("     3. Healing kit, heals: 50", end="")
+            input("")
+            print("")
+            print("     The items that fit have been added to your inventory!")
+            input("")
+
+            i1 = Weapon("M16", 3, 35)
+            i2 = Weapon("Knife", 2, 20)
+            i3 = Food("Healing kit", 0, 50, 1)
+
+            if self.inv.fits(i1):
+                self.inv.items.append(i1)
+            if self.inv.fits(i2):
+                self.inv.items.append(i2)
+            if self.inv.fits(i3):
+                self.inv.items.append(i3)
             return True
         else:
             return False
@@ -453,67 +493,84 @@ class Invasion():
 
     #Method for supermarket chapter
     def supermarket_chapter(self):
+        self.clr()
         print("\n\n")
         print("----- The Supermarket -----".center(80))
-        print("\n")
-        self.wait(5)
-        print("".center(80))
-        print("\n")
-        self.wait(3)
-        print("".center(80))
-        print("\n")
-        self.wait(3)
-        print("".center(80)) 
-        print("\n")
-        self.wait(3)
-        print("".center(80))
-        print("\n\n\n")
-        input("")
-        self.clr()
+        self.sorry_Peter_LG()
 
     #Method for gas station chapter
     def gas_chapter(self):
+        self.clr()
         print("\n\n")
         print("----- The Gas Station -----".center(80))
-        print("\n")
-        self.wait(5)
-        print("".center(80))
-        print("\n")
-        self.wait(3)
-        print("".center(80))
-        print("\n")
-        self.wait(3)
-        print("".center(80)) 
-        print("\n")
-        self.wait(3)
-        print("".center(80))
-        print("\n\n\n")
-        input("")
-        self.clr()
+        self.sorry_Peter_LG()
 
     #Method for chapter in the woods
     def woods_chapter(self):
+        self.clr()
         print("\n\n")
         print("----- The Woods -----".center(80))
-        print("\n")
-        self.wait(5)
-        print("".center(80))
-        print("\n")
-        self.wait(3)
-        print("".center(80))
-        print("\n")
-        self.wait(3)
-        print("".center(80)) 
-        print("\n")
-        self.wait(3)
-        print("".center(80))
-        print("\n\n\n")
-        input("")
-        self.clr()
+        self.sorry_Peter_LG()
 
     #Method for final chapter of the story
     def final_chapter(self):
-        self.finished = True
+        self.clr()
+        print("\n\n")
+        print("----- The Final Chapter -----".center(80))
+        print("")
+        input("")
+        print("After a long journey, you finally make it to the research centre.".center(80))
+        input("")
+        print((self.name.title()+": Well guys, this is it. I'm going in alone.").center(80))
+        input("")
+        print("Evan: No, don't leave us!".center(80))
+        input("")
+        print((self.name.title()+": I have to, it's just too dangerous!").center(80))
+        input("")
+
+        self.story_2("As you walk through the door, the noise increases in volume.", "You slowly walk towards the sound.")
+        input("")
+
+        self.story_3("In the distance, you see a large item on the ground.", "It looks like a powerful weapon!", (self.name.title()+": Better pick it up!"))
+        input("")
+        print("Plasma Rifle (125) has been added to your inventory.".center(80))
+        input("")
+        rifle = Weapon("Plasma Rifle", 2, 125)
+        if self.inv.fits(rifle):
+            self.inv.items.append(rifle)
+        self.story_3("You slowly open the door..", (self.name.title()+": ......."), (self.name.title()+": Oh. Shit."))
+        input("")
+        self.save_progress()
+
+        self.story_2("A huge alien monster stands in the middle of the room.", "Get ready to fight!")
+        input("")
+
+        final_boss = NPC("Budalt",250,35,"evil")
+        fight = Fight(self.name, self.health, self.inv, self.companions, final_boss)
+        if (fight.start() == True):
+            self.clr()
+            print("\n\n")
+            print((self.name.title()+": Ouch..! I guess this was it..").center(80))
+            input("")
+            self.clr()
+            print("\n\n")
+            print(("Too bad "+self.name.title()+", Budalt proved to be too strong for you.").center(80))
+            input("")
+            print("I still hope you enjoyed the game 'Invasion' by Daniel Hartgers.".center(80))
+            input("")
+            self.finished = True
+        else:
+            self.clr()
+            print("\n\n")
+            print((self.name.title()+": Holy shit..! I did it?!").center(80))
+            input("")
+            self.clr()
+            print("\n\n")
+            print(("Congratulations, "+self.name.title()+", you did it!").center(80))
+            input("")
+            print("I hope you enjoyed the game 'Invasion' by Daniel Hartgers.".center(80))
+            input("")
+            self.finished = True
 
     #Method for end screen
     def end_screen(self):
@@ -537,7 +594,4 @@ class Invasion():
     def start(self):
         #Check for savefiles.
         if not (self.show_loadscreen()):
-            if not self.debug:
-                self.show_infoscreen()
-            else:
-                self.name = "Daniel"
+            self.show_infoscreen()
