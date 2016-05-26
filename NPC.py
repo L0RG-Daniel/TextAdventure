@@ -6,7 +6,7 @@ class NPC():
         self.name = name
         self.health = health
         self.status = status
-        self.dmg = dmg
+        self.eff = dmg
 
     def is_good(self):
         if self.status == "good":

@@ -13,16 +13,12 @@ class Fight():
         self.turn = 'P'
         self.ene_start_hp = self.enemy.health
         self.lost = False
-        
-        #Create testing items.
         self.curr_weapon = Weapon("Fists", 0, 10)
-        f1 = Food("apple", 1, 30, 1)
-        f2 = Food("bread", 3, 50, 3)
-        w1 = Weapon("knife", 2, 25)
-        self.p_inv.items.append(f1)
-        self.p_inv.items.append(f2)
-        self.p_inv.items.append(self.curr_weapon)
-        self.p_inv.items.append(w1)
+
+        for item in self.p_inv.items:
+            if isinstance(item, Weapon):
+                self.curr_weapon = item
+                break
         
     #Method for clearing screen.
     def clr(self):
@@ -76,9 +72,24 @@ class Fight():
                     res = input("     What do you want to do? (att/items): ")
                 if res == 'att':
                     self.clr()
-                    self.enemy.health -= self.curr_weapon.eff
+                    total_dmg = self.curr_weapon.eff
+                    bonus_dmg = 0
+                    for comp in self.p_comp:
+                        if comp.bonus == "dmg":
+                            total_dmg += comp.eff
+                            bonus_dmg += comp.eff
+                            break
+                        else:
+                            pass
+
+                    self.enemy.health -= total_dmg
+                    if self.enemy.health < 0:
+                        self.enemy.health = 0
                     print("")
-                    print("     You hit (" + self.enemy.name + ") with (" + self.curr_weapon.name + ") for " + str(self.curr_weapon.eff) + " damage!")
+                    if bonus_dmg > 0:
+                        print("     You hit ("+self.enemy.name+") with ("+self.curr_weapon.name+") for "+str(self.curr_weapon.eff)+" + "+str(bonus_dmg)+" bonus damage!")
+                    else:
+                        print("     You hit ("+self.enemy.name+") with ("+self.curr_weapon.name+") for "+str(total_dmg)+" damage!")
                     print("     Enemy health is now " + str(self.enemy.health) + "/" + str(self.ene_start_hp) + ".")
                     input("")
                 else:
@@ -108,8 +119,18 @@ class Fight():
                             print(item.name.title() + " with damage " + str(item.eff) + " is now equipped!")
                             input("")
                     elif isinstance(item, Food):
-                        self.p_health += item.eff
-                        print(item.name.title() + " has healed " + str(item.eff) + " health!")
+                        total_heal = item.eff
+                        bonus_heal = 0
+                        for comp in self.p_comp:
+                            if comp.bonus == "heal":
+                                total_heal += comp.eff
+                                bonus_heal += comp.eff
+                                break
+                            else:
+                                pass
+
+                        self.p_health += total_heal
+                        print(item.name.title()+" has healed "+str(item.eff)+" + "+str(bonus_heal)+" bonus health!")
                         item.amount -=1
                         if item.amount == 0:
                             print("You have now run out of item " + item.name + "!")

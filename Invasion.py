@@ -15,11 +15,11 @@ class Invasion():
         
         #Print starting screen
         print("\n\n")
-        print("       !@#$%  &    !  $       /     ^       {+%#   AAAAA    AAA   &    !     ")
-        print("         *    $#   @   %     }     & @     @         A     A   A  $#   @     ")
-        print("         %    % $  #    (   ?     ; - +     >&^#     A     A   A  % $  #     ")
-        print("         #    ^  ( $     = `     -     $        ~    A     A   A  ^  ( $     ")
-        print("       ^*(%#  *   +$      #     *       #   )+!?   AAAAA    AAA   *   +$     ")
+        print("       !@#$%  &    !  $       /     ^       {+%#   !#}{?    =+>   &    !     ")
+        print("         *    $#   @   %     }     & @     @         ^     `   -  $#   @     ")
+        print("         %    % $  #    (   ?     ; - +     >&^#     %     ~   }  % $  #     ")
+        print("         #    ^  ( $     = `     -     $        ~    #     *   |  ^  ( $     ")
+        print("       ^*(%#  *   +$      #     *       #   )+!?   !??<+    $<[   *   +$     ")
         print("                                                                             ")
         print("\n\n\n\n\n\n")
         input("                        Press Enter to start the game                        \n                                                                             \n                                     ")
@@ -67,6 +67,9 @@ class Invasion():
                     #Create temporary Inventory, fill this inv with items from savefile.
                     tmp_inv = Inventory()
 
+                    #Create temporary Companion list, fill this list with companions from savefile.
+                    tmp_comps = []
+
                     #Load values into game
                     for entry in game_state:
                         if entry['var'] == 'name':
@@ -80,6 +83,7 @@ class Invasion():
                                 self.finished = True
                             else:
                                 self.finished = False
+
                         #Loop through chapters and split where necessary
                         elif entry['var'] == 'chapters':
                             temp_arr = re.split(",", entry['value'])
@@ -91,6 +95,7 @@ class Invasion():
                                     pass
                         elif entry['var'] == 'invsize':
                             tmp_inv.size = int(entry['value'])
+
                         #Loop through all items in inventory and split where necessary
                         elif entry['var'] == 'items':
                             temp_items = re.split("/", entry['value'])
@@ -105,10 +110,21 @@ class Invasion():
                                 elif itm[0] == 'f':
                                     temp_food = Food(itm[1], int(itm[2]), int(itm[3]), int(itm[4]))
                                     tmp_inv.items.append(temp_food)
-                                else:
-                                    temp_itm = Item(itm[1], int(item[2]))
+                                elif itm[0] == 'i':
+                                    temp_itm = Item(itm[1], int(itm[2]))
                                     tmp_inv.items.append(temp_itm)
+                                else:
+                                    pass
                             self.inv = tmp_inv
+
+                        #Loop through all companions in list and split where necessary
+                        elif entry['var'] == 'companions':
+                            temp_comps = re.split("/", entry['value'])
+                            for comp in temp_comps:
+                                cmp = re.split(",", comp)
+                                temp_cmp = Person(cmp[0],int(cmp[1]),int(cmp[2]),cmp[3],cmp[4])
+                                tmp_comps.append(temp_cmp)
+                            self.companions = tmp_comps
                         else:
                             pass
 
@@ -206,6 +222,16 @@ class Invasion():
                 inv_string = inv_string[:-1]
                 save_file.write("items=" + inv_string + "\n")
 
+                #Write companions
+                list_string = ""
+                comp_string = ""
+                for i in range(0, len(self.companions)):
+                    comp = self.companions[i]
+                    comp_string = (comp.name+","+str(comp.health)+","+str(comp.dmg)+","+comp.status+","+comp.bonus+"/")   
+                    list_string += comp_string
+                comp_string = comp_string[:-1]
+                save_file.write("companions=" + comp_string + "\n")
+
         #Don't save, notify user.
         elif res in ('n', 'no'):
             self.clr()
@@ -300,7 +326,13 @@ class Invasion():
         elif opt == "walk":
             self.story_3((self.name.title() + ": I'm going around for a walk now, I'll be right back."), "You find a box of popcorn. After that, you walk over to the door.", "Huh? The doors are locked!")
             f1 = Food("popcorn", 2, 25, 1)
-            self.inv.items.append(f1)
+            if self.inv.fits(f1):
+                self.inv.items.append(f1)
+                print("\n\n")
+                print("     Item ("+f1.name+") has been added to inventory.")
+            else:
+                print("\n\n")
+                print("     Item ("+f1.name+") doesn't fit in inventory.")
             return True
         elif opt == "wait":
             self.story_2("You decide to be patient, good choice.", "After all, you are not in a rush, right?")
@@ -390,6 +422,9 @@ class Invasion():
                                 ally.health -= 80
                                 if ally.health < 1:
                                     self.story_2("Evan: Oh no.. Alex.. ALEX!", "Tyler: Sorry guys, Alex is gone.")
+                                    for i in range(0, len(self.companions)):
+                                        if self.companions[i].name == "Alex":
+                                            self.companions.pop(i)
                                 else:
                                     self.story_2("Evan: Alex, are you allright?", "Alex: Well, I'm alive, but I took some serious damage.")
                                 break
@@ -484,11 +519,11 @@ class Invasion():
     def end_screen(self):
         self.clr()
         print("\n\n")
-        print("       !@#$%  &    !  $       /     ^       {+%#   AAAAA    AAA   &    !     ")
-        print("         *    $#   @   %     }     & @     @         A     A   A  $#   @     ")
-        print("         %    % $  #    (   ?     ; - +     >&^#     A     A   A  % $  #     ")
-        print("         #    ^  ( $     = `     -     $        ~    A     A   A  ^  ( $     ")
-        print("       ^*(%#  *   +$      #     *       #   )+!?   AAAAA    AAA   *   +$     ")
+        print("       !@#$%  &    !  $       /     ^       {+%#   !#}{?    =+>   &    !     ")
+        print("         *    $#   @   %     }     & @     @         ^     `   -  $#   @     ")
+        print("         %    % $  #    (   ?     ; - +     >&^#     %     ~   }  % $  #     ")
+        print("         #    ^  ( $     = `     -     $        ~    #     *   |  ^  ( $     ")
+        print("       ^*(%#  *   +$      #     *       #   )+!?   !??<+    $<[   *   +$     ")
         print("                                                                             ")
         print("\n\n")
         print(("Dear "+self.name.title()+",").center(80))

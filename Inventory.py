@@ -8,3 +8,9 @@ class Inventory():
         for item in self.items:
             space_left -= item['weight']
         return space_left
+
+    def fits(self, item):
+        if item.weight <= self.space_left():
+            return True
+        else:
+            return False
