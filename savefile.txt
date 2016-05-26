@@ -1,7 +1,8 @@
-name=Kanker
+name=Daniel
 health=10
 chapter=2
 finished=True
-chapters=
+chapters=2,3,4
 invsize=25
-items=f,apple,1,30,1/f,bread,3,50,2/w,Fists,0,10/w,knife,2,25
+items=
+companions=Alex,80,10,good,heal

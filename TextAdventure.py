@@ -14,6 +14,13 @@ import random
 game = adv.Invasion()
 game.start()
 
+#Demo
+'''
+game.mall_chapter()
+game.finished=True
+game.end_screen()
+'''
+
 #Check if the player is still alive and well
 while not game.finished:
 
